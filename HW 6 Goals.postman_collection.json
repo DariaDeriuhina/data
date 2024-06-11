@@ -1,0 +1,1043 @@
+{
+	"info": {
+		"_postman_id": "1d65d957-ec40-4a29-a84f-90ab87af3d0d",
+		"name": "HW 6 Goals",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17853771"
+	},
+	"item": [
+		{
+			"name": "Create valid goal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"//Test2\r",
+							"pm.test(\"Team id is correct\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.team_id).to.eql(pm.environment.get(\"team_id\"));\r",
+							"});\r",
+							"\r",
+							"//Test3\r",
+							"pm.test(\"Name goal check\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    var randomLanguage = pm.collectionVariables.get(\"random_language\");\r",
+							"    var randomNumber = pm.collectionVariables.get(\"random_number\");\r",
+							"    \r",
+							"    pm.expect(jsonData.goal.name).to.contain(randomLanguage);\r",
+							"    pm.expect(jsonData.goal.name).to.contain(randomNumber);\r",
+							"});\r",
+							"\r",
+							"var newGoalId = pm.response.json().goal.id; // Отримати ідентифікатор новоствореної цілі\r",
+							"var goalIds = pm.collectionVariables.get(\"goalIds\") || []; // Отримати поточні значення змінної колекції\r",
+							"goalIds.push(newGoalId); // Додати новий ідентифікатор до масиву\r",
+							"pm.collectionVariables.set(\"goalIds\", goalIds); // Оновити значення змінної колекції\r",
+							"\r",
+							"pm.collectionVariables.set(\"goalId\", newGoalId); "
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function getRandomNumber(min, max) {\r",
+							"    return Math.floor(Math.random() * (max - min + 1)) + min;\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"random_number\", getRandomNumber(1, 5000));\r",
+							"\r",
+							"function getRandomLanguage() {\r",
+							"    const languages = [\r",
+							"        \"English\", \"Spanish\", \"Chinese\", \"Hindi\", \"Arabic\", \r",
+							"        \"Portuguese\", \"Bengali\", \"Ukranian\", \"Punjabi\", \r",
+							"        \"German\", \"Korean\", \"French\", \"Turkish\", \"Vietnamese\"\r",
+							"    ];\r",
+							"    const randomIndex = Math.floor(Math.random() * languages.length);\r",
+							"    return languages[randomIndex];\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"random_language\", getRandomLanguage());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"learn new {{random_number}} {{random_language}} words\",\r\n    \"due_date\": 1568036964079,\r\n    \"description\": \"{{random_number}}\",\r\n    \"multiple_owners\": false,\r\n    \"color\": \"#32a852\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/{{team_id}}/goal",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"{{team_id}}",
+						"goal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create invalid goal (miss name)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 500\", function () {\r",
+							"    pm.response.to.have.status(500);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.err).to.eql(\"null value in column \\\"name\\\" violates not-null constraint\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"due_date\": 1568036964079,\r\n    \"description\": \"I would like to explore the world\",\r\n    \"multiple_owners\": false,\r\n    \"color\": \"#32a852\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/{{team_id}}/goal",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"{{team_id}}",
+						"goal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User able to get list of goals to specific team_id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//Test 2",
+							"var jsonData = pm.response.json();",
+							"var goalIds = [];",
+							"var goalSubList = pm.environment.get(\"goalIds\");",
+							"",
+							"jsonData.goals.forEach(function(goal) {",
+							"    goalIds.push(goal.id);",
+							"});",
+							"",
+							"// Перевірка чи є в get list список вже створених постманом голів",
+							"pm.test(\"Перевірка чи є в get list список вже створених постманом голів\", function () {",
+							"    let contains = true;",
+							"    if (goalSubList) {",
+							"        for (let i = 0; i <= goalIds.length - goalSubList.length; i++) {",
+							"            let found = true;",
+							"            for (let j = 0; j < goalSubList.length; j++) {",
+							"                if (goalIds[i + j] !== goalSubList[j]) {",
+							"                    found = false;",
+							"                    break;",
+							"                }",
+							"            }",
+							"            if (found) {",
+							"                contains = true;",
+							"                break;",
+							"            }",
+							"        }",
+							"    }",
+							"    pm.expect(contains).to.be.true;",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/team/{{team_id}}/goal",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"{{team_id}}",
+						"goal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User unable to get spaces with invalid API key",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message test\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.err).to.eql(\"Token invalid\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFG"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/team/{{team_id}}/goal",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"{{team_id}}",
+						"goal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User able to get a goal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Your id is correct\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.goal.id).to.eql(pm.collectionVariables.get(\"goalId\"));\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/goal/{{goalId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"goal",
+						"{{goalId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update goal with valid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"//Test2\r",
+							"pm.test(\"Team id is correct\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.team_id).to.eql(pm.environment.get(\"team_id\"));\r",
+							"});\r",
+							"\r",
+							"//Test3\r",
+							"pm.test(\"Name goal check\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    var randomLanguage = pm.collectionVariables.get(\"updated_language\");\r",
+							"    var randomNumber = pm.collectionVariables.get(\"updated_number\");\r",
+							"    \r",
+							"    pm.expect(jsonData.goal.name).to.contain(randomLanguage);\r",
+							"    pm.expect(jsonData.goal.name).to.contain(randomNumber);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function getRandomNumber(min, max) {\r",
+							"    return Math.floor(Math.random() * (max - min + 1)) + min;\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"updated_number\", getRandomNumber(1, 3000));\r",
+							"\r",
+							"function getRandomLanguage() {\r",
+							"    const languages = [\r",
+							"        \"English\", \"Spanish\", \"Chinese\", \"Hindi\", \"Arabic\", \r",
+							"        \"Portuguese\", \"Bengali\", \"Ukranian\",\r",
+							"        \"German\", \"Korean\", \"French\", \"Turkish\", \"Vietnamese\"\r",
+							"    ];\r",
+							"    const randomIndex = Math.floor(Math.random() * languages.length);\r",
+							"    return languages[randomIndex];\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"updated_language\", getRandomLanguage());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Decided to change goal: {{updated_number}} {{updated_language}} words\",\r\n    \"due_date\": 1568036964079,\r\n    \"description\": \"Updated Goal Description\",\r\n    \"color\": \"#32a852\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/goal/{{goalId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"goal",
+						"{{goalId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update goal with invalid json",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Decided to change goal\",\r\n\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/goal/{{goalId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"goal",
+						"{{goalId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User is able to delete goal",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/goal/{{goalId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"goal",
+						"{{goalId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User is unable to delete goal with unvalid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 500\", function () {\r",
+							"    pm.response.to.have.status(500);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/goal/2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"goal",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Key Result with valid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"//Test 2\r",
+							"pm.test(\"Check name of key result\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var randomActivity = pm.collectionVariables.get(\"random_activity\");\r",
+							"    \r",
+							"    pm.expect(jsonData.key_result.name).to.equal(randomActivity);\r",
+							"});\r",
+							"\r",
+							"var keyResultId = pm.response.json().key_result.id; \r",
+							"pm.collectionVariables.set(\"key_result\", keyResultId);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function getRandomActivity() {\r",
+							"    const activities = [\r",
+							"        \"Speaking\", \"Listening\", \"Use of English\", \"Reading\", \"Writing\"\r",
+							"    ];\r",
+							"    const randomIndex = Math.floor(Math.random() * activities.length);\r",
+							"    return activities[randomIndex];\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"random_activity\", getRandomActivity());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{random_activity}}\",\n    \"type\": \"number\",\n    \"steps_start\": 0,\n    \"steps_end\": 10,\n    \"unit\": \"km\",\n    \"task_ids\": [],\n    \"list_ids\": []\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/goal/{{goalId}}/key_result",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"goal",
+						"{{goalId}}",
+						"key_result"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User is unable to create Key Result without name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"//Test 2\r",
+							"pm.test(\"Check name of key result\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.err).to.equal(\"Key result must have a name\");\r",
+							"}); \r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"type\": \"number\",\n    \"steps_start\": 0,\n    \"steps_end\": 10,\n    \"unit\": \"km\",\n    \"task_ids\": [],\n    \"list_ids\": []\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/goal/{{goalId}}/key_result",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"goal",
+						"{{goalId}}",
+						"key_result"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit key Result with valid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"steps_current\": {{$randomInt}},\n    \"note\": \"Target achieved\"\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/key_result/{{key_result}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"key_result",
+						"{{key_result}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit key Result with invalid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message check\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.err).to.eql(\"No valid edit options passed\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"note\": \"Target achieved\"\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/key_result/{{key_result}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"key_result",
+						"{{key_result}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User is able to delete key result",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(pm.response.text()).to.equal('{}');\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "pk_74466733_JD4H6UQYL7Q2GSFMYMPSVOWDR5TNFGXE"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/key_result/{{key_result}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"key_result",
+						"{{key_result}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "team_id",
+			"value": "9015697752"
+		},
+		{
+			"key": "random_number",
+			"value": ""
+		},
+		{
+			"key": "random_language",
+			"value": ""
+		},
+		{
+			"key": "goal_ids",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "goalIds",
+			"value": ""
+		},
+		{
+			"key": "goalId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "updated_language",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "updated_number",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "random_activity",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "key_result",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
